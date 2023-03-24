@@ -23,7 +23,6 @@ function inputDigit(digit: string) {
     displayValue = digit;
     waitingForSecondOperand = false;
   } else {
-    firstOperand = Number(displayValue + digit);
     displayValue = displayValue === "0" ? digit : displayValue + digit;
   }
 }
@@ -42,13 +41,12 @@ function handleOperator(nextOperator: Operator) {
 
   if (operator && waitingForSecondOperand) {
     operator = nextOperator;
-    waitingForSecondOperand = false;
     return;
   }
 
   if (firstOperand === null) {
     firstOperand = inputValue;
-  } else if (operator) {
+  } else {
     const result = calculate();
     displayValue = `${result}`;
     firstOperand = result;
@@ -65,20 +63,28 @@ function calculate() {
     return inputValue;
   }
 
+  let result: number;
   switch (operator) {
     case Operator.ADD:
-      return firstOperand + inputValue;
+      result = firstOperand + inputValue;
+      break;
     case Operator.SUBTRACT:
-      return firstOperand - inputValue;
+      result = firstOperand - inputValue;
+      break;
     case Operator.MULTIPLY:
-      return firstOperand * inputValue;
+      result = firstOperand * inputValue;
+      break;
     case Operator.DIVIDE:
-      return firstOperand / inputValue;
+      result = firstOperand / inputValue;
+      break;
     case Operator.REMAINDER:
-      return firstOperand % inputValue;
+      result = firstOperand % inputValue;
+      break;
     default:
       throw new Error(`Invalid operator: ${operator}`);
   }
+
+  return result;
 }
 
 function updateDisplay() {
@@ -114,6 +120,12 @@ function onClickOperator(_operator: string) {
         displayValue = `${result}`;
         firstOperand = result;
         operator = null;
+      } else if (operator && waitingForSecondOperand) {
+        const result = calculate();
+        displayValue = `${result}`;
+        firstOperand = result;
+        operator = null;
+        waitingForSecondOperand = false;
       }
       break;
     case "+/-":

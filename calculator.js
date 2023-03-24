@@ -23,8 +23,8 @@ function inputDigit(digit) {
         waitingForSecondOperand = false;
     }
     else {
-        firstOperand = Number(displayValue + digit);
-        displayValue = displayValue === "0" ? digit : displayValue + digit;
+        //firstOperand = Number(displayValue + digit); // 기존 코드
+        displayValue = displayValue === "0" ? digit : displayValue + digit; // 수정된 코드
     }
 }
 function inputDecimal() {
@@ -40,13 +40,12 @@ function handleOperator(nextOperator) {
     const inputValue = parseFloat(displayValue);
     if (operator && waitingForSecondOperand) {
         operator = nextOperator;
-        waitingForSecondOperand = false;
         return;
     }
     if (firstOperand === null) {
         firstOperand = inputValue;
     }
-    else if (operator) {
+    else {
         const result = calculate();
         displayValue = `${result}`;
         firstOperand = result;
@@ -59,20 +58,27 @@ function calculate() {
     if (firstOperand === null || operator === null) {
         return inputValue;
     }
+    let result;
     switch (operator) {
         case Operator.ADD:
-            return firstOperand + inputValue;
+            result = firstOperand + inputValue;
+            break;
         case Operator.SUBTRACT:
-            return firstOperand - inputValue;
+            result = firstOperand - inputValue;
+            break;
         case Operator.MULTIPLY:
-            return firstOperand * inputValue;
+            result = firstOperand * inputValue;
+            break;
         case Operator.DIVIDE:
-            return firstOperand / inputValue;
+            result = firstOperand / inputValue;
+            break;
         case Operator.REMAINDER:
-            return firstOperand % inputValue;
+            result = firstOperand % inputValue;
+            break;
         default:
             throw new Error(`Invalid operator: ${operator}`);
     }
+    return result;
 }
 function updateDisplay() {
     const calculatorDisplay = document.querySelector(".calculator-display");
@@ -105,6 +111,13 @@ function onClickOperator(_operator) {
                 displayValue = `${result}`;
                 firstOperand = result;
                 operator = null;
+            }
+            else if (operator && waitingForSecondOperand) {
+                const result = calculate();
+                displayValue = `${result}`;
+                firstOperand = result;
+                operator = null;
+                waitingForSecondOperand = false;
             }
             break;
         case "+/-":

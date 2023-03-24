@@ -23,10 +23,10 @@ export function inputDigit(digit: string) {
     displayValue = digit;
     waitingForSecondOperand = false;
   } else {
-    firstOperand = Number(displayValue + digit);
     displayValue = displayValue === "0" ? digit : displayValue + digit;
   }
 }
+
 
 export function inputDecimal() {
   if (waitingForSecondOperand) {
@@ -42,13 +42,12 @@ export function handleOperator(nextOperator: Operator) {
 
   if (operator && waitingForSecondOperand) {
     operator = nextOperator;
-    waitingForSecondOperand = false;
     return;
   }
 
   if (firstOperand === null) {
     firstOperand = inputValue;
-  } else if (operator) {
+  } else {
     const result = calculate();
     displayValue = `${result}`;
     firstOperand = result;
@@ -65,20 +64,28 @@ export function calculate() {
     return inputValue;
   }
 
+  let result: number;
   switch (operator) {
     case Operator.ADD:
-      return firstOperand + inputValue;
+      result = firstOperand + inputValue;
+      break;
     case Operator.SUBTRACT:
-      return firstOperand - inputValue;
+      result = firstOperand - inputValue;
+      break;
     case Operator.MULTIPLY:
-      return firstOperand * inputValue;
+      result = firstOperand * inputValue;
+      break;
     case Operator.DIVIDE:
-      return firstOperand / inputValue;
+      result = firstOperand / inputValue;
+      break;
     case Operator.REMAINDER:
-      return firstOperand % inputValue;
+      result = firstOperand % inputValue;
+      break;
     default:
       throw new Error(`Invalid operator: ${operator}`);
   }
+
+  return result;
 }
 
 export function updateDisplay() {
@@ -114,6 +121,12 @@ export function onClickOperator(_operator: string) {
         displayValue = `${result}`;
         firstOperand = result;
         operator = null;
+      } else if (operator && waitingForSecondOperand) {
+        const result = calculate();
+        displayValue = `${result}`;
+        firstOperand = result;
+        operator = null;
+        waitingForSecondOperand = false;
       }
       break;
     case "+/-":
